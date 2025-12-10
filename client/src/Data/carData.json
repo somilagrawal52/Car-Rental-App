@@ -1,0 +1,30 @@
+[
+    {
+        "id":1,
+        "name":"Toyota Camry",
+        "category":"Sedan",
+        "seats":5,
+        "fuel":"Petrol",
+        "year":2018,
+        "model":"2020",
+        "milage":28,
+        "price":1500,   
+        "transmission":false,
+        "image":"https://images.pexels.com/photos/2036544/pexels-photo-2036544.jpeg",
+        "about":"The Toyota Camry is a comfortable and reliable sedan, perfect for city driving and long trips alike."
+    },
+    {
+        "id":2,
+        "name":"Wagon R",
+        "category":"Hatchback",
+        "seats":5,
+        "fuel":"Petrol",
+        "year":2018,
+        "model":"2020",
+        "milage":18,
+        "price":1200,
+        "transmission":false,
+        "image":"https://images.pexels.com/photos/11449228/pexels-photo-11449228.jpeg",
+        "about":"The Wagon R is a compact and efficient hatchback, ideal for city commuting and easy parking."
+    }
+]
