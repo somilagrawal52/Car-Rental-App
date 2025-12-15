@@ -44,4 +44,4 @@ const AdminAuth = async (req, res, next) => {
   }
 };
 
-module.exports = { checkforauth };
+module.exports = { checkforauth, AdminAuth };

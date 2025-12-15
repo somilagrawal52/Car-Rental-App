@@ -42,11 +42,11 @@ userSchema.pre("save", async function () {
 userSchema.statics.matchpassword = async function (email, password) {
   const user = await this.findOne({ email });
   if (!user) {
-    throw new Error("User not found");
+    return null;
   }
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    throw new Error("Invalid password");
+    return null;
   }
   return user;
 };

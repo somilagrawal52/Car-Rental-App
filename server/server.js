@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const connectDB = require("./Config/db");
 const userRoutes = require("./Routes/User");
+const carRoutes = require("./Routes/Car");
 
 connectDB();
 
@@ -15,6 +16,7 @@ app.use(morgan("dev"));
 app.use(express.json());
 
 app.use("/api/user", userRoutes);
+app.use("/api/car", carRoutes);
 
 app.get("/", (req, res) => {
   res.send("Car Rental Service API is running");

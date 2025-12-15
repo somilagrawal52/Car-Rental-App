@@ -45,8 +45,20 @@ const login = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
     const user = await User.matchpassword(email, password);
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
     const token = createToken(user);
-    res.status(200).json({ message: "Login successful", user, token });
+    if (!token) {
+      console.error("JWT token creation failed");
+      return res.status(500).json({ message: "Internal server error" });
+    }
+    // hide password before sending user object
+    const userSafe = user.toObject();
+    delete userSafe.password;
+    res
+      .status(200)
+      .json({ message: "Login successful", user: userSafe, token });
   } catch (error) {
     console.error("Error logging in user:", error);
     res.status(500).json({ message: "Internal server error" });
