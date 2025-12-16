@@ -34,7 +34,10 @@ async function checkforauth(req, res, next) {
 const AdminAuth = async (req, res, next) => {
   try {
     const user = req.user;
-    if (user.role !== "admin") {
+    if (!user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    if (!user.role || user.role !== "admin") {
       return res.status(403).json({ message: "Access denied. Admins only." });
     }
     next();
