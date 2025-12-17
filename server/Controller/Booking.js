@@ -94,4 +94,71 @@ const getById = async (req, res) => {
   }
 };
 
-module.exports = { createBooking, getAllBooking, getById };
+const updateBookingStatus = async (req, res) => {
+  try {
+    const { id } = req.params.id;
+    if (!id) {
+      return res.status(500).send({
+        success: false,
+        message: "please provide booking id",
+      });
+    }
+    const { status } = req.body;
+    const updatedStatus = await Booking.findByIDAndUpdate(
+      id,
+      {
+        $set: { status },
+      },
+      { returnOriginal: false }
+    );
+    res.status(200).send({
+      success: true,
+      message: "booking status updated successfully",
+      booking,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: true,
+      message: "Internal server error",
+      error,
+    });
+  }
+};
+
+const getUserBooking = async (req, res) => {
+  try {
+    const { id } = req.params.id;
+    if (!id) {
+      return res.status(500).send({
+        success: false,
+        message: "please provide booking id",
+      });
+    }
+    const user = await User.findById({ _id: id });
+    const booking = await Booking.find({ user: user._id });
+    const car = await Car.find({ _id: booking[0].car });
+
+    res.status(200).send({
+      success: true,
+      message: "here is your booking",
+      totalBooking: booking.length,
+      booking,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: true,
+      message: "Internal server error",
+      error,
+    });
+  }
+};
+
+module.exports = {
+  createBooking,
+  getAllBooking,
+  getById,
+  updateBookingStatus,
+  getUserBooking,
+};
