@@ -21,6 +21,15 @@ const addCar = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
+    if (!req.file) {
+      return res.status(404).json({
+        success: false,
+        message: "please add image",
+      });
+    }
+
+    const photobase64 = req.file ? req.file.buffer.toString("base64") : null;
+
     const newCar = new Car({
       name,
       category,
@@ -31,7 +40,7 @@ const addCar = async (req, res) => {
       milage,
       price,
       transmission,
-      image,
+      image: photobase64,
       about,
       status,
     });
