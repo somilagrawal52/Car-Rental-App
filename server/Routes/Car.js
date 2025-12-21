@@ -17,7 +17,7 @@ router.post(
   upload.single("image"),
   addCar
 );
-router.get("/all-cars", AdminAuth, getAllCars);
+router.get("/all-cars", getAllCars);
 router.get("/:id", AdminAuth, getCarById);
 router.patch("/update-car/:id", checkforauth, AdminAuth, updateCar);
 router.delete("/delete-car/:id", checkforauth, AdminAuth, deleteCar);

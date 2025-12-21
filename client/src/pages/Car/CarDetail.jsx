@@ -5,12 +5,17 @@ import toast from "react-hot-toast";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import BookingModal from "../../Components/BookingModal";
+import { useDispatch, useSelector } from "react-redux";
+import { getCarDetails } from "../../Store/feature/CarSlice.js";
 
 const CarDetail = () => {
   const user = true;
   const { id } = useParams();
   const [CarDetails, setCarDetails] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const { cars } = useSelector((state) => state.cars);
+  const dispatch = useDispatch();
 
   const [show, setShow] = useState(false);
   const [pickupDate, setPickupDate] = useState(
@@ -24,12 +29,12 @@ const CarDetail = () => {
   const getCardInfo = () => {
     setLoading(true);
     try {
-      const carInfo = carsData.find((car) => car.id === parseInt(id));
-
-      if (carInfo) {
+      dispatch(getCarDetails(id));
+      if (cars) {
+        const carInfo = cars?.find((car) => car?._id === id);
         setCarDetails(carInfo);
-        setLoading(false);
       }
+      setLoading(false);
     } catch (error) {
       console.log("Error fetching car details:", error);
     }
@@ -53,7 +58,7 @@ const CarDetail = () => {
           <div className="row my-4" style={{ minHeight: "70vh" }}>
             <div className="col-md-6">
               <img
-                src={CarDetails.image}
+                src={`data:image/png;base64,${CarDetails?.image}`}
                 alt="car-image"
                 className="img-fluid rounded"
               />

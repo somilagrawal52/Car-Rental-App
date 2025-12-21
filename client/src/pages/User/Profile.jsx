@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import EditModel from "../../Components/EditModel";
+import BookingDetails from "../../Components/BookingDetails";
 
 const Profile = () => {
   const [editModel, setEditModel] = useState(false);
@@ -36,13 +37,22 @@ const Profile = () => {
                 <i
                   className="fa-solid fa-eye text-primary"
                   style={{ cursor: "pointer" }}
+                  onClick={() => setBookingDetails(!bookingDetails)}
                 ></i>
               </td>
             </tr>
           </table>
         </div>
       </div>
-      {editModel && <EditModel editModel={editModel} setEditModel={setEditModel}/>}
+      {editModel && (
+        <EditModel editModel={editModel} setEditModel={setEditModel} />
+      )}
+      {bookingDetails && (
+        <BookingDetails
+          bookingDetails={bookingDetails}
+          setBookingDetails={setBookingDetails}
+        />
+      )}
     </>
   );
 };
