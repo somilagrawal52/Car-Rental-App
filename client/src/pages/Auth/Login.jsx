@@ -2,24 +2,34 @@ import React, { useState } from "react";
 import register from "../../assets/User Interface.gif";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router";
+import API from "../../api/API";
+import { saveSession } from "../../api/session";
+
 const Login = () => {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     try {
       if (!email || !password) {
         return toast.error("All fields are required");
       }
+
+      setLoading(true);
+      const { data } = await API.post("/user/login", { email, password });
+      saveSession({ token: data.token, user: data.user });
       setemail("");
       setpassword("");
       toast.success("Login Successful");
-      navigate("/cars");
+      navigate("/profile");
     } catch (error) {
-      console.log("Login Error:", error);
+      toast.error(error.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -63,8 +73,12 @@ const Login = () => {
                 aria-describedby="passwordHelp"
               />
             </div>
-            <button className="btn btn-primary w-100" onClick={handleRegister}>
-              Login Now
+            <button
+              className="btn btn-primary w-100"
+              onClick={handleRegister}
+              disabled={loading}
+            >
+              {loading ? "Logging in..." : "Login Now"}
             </button>
           </div>
         </div>

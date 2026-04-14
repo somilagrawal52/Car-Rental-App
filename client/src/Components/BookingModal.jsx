@@ -10,6 +10,7 @@ const BookingModal = (props) => {
     returnDate,
     setReturnDate,
     handleBooking,
+    bookingLoading,
   } = props;
 
   const calculateTotal = () => {
@@ -82,8 +83,9 @@ const BookingModal = (props) => {
                 type="button"
                 className="btn btn-primary"
                 onClick={handleBooking}
+                disabled={bookingLoading}
               >
-                Book
+                {bookingLoading ? "Booking..." : "Book"}
               </button>
             </div>
           </div>

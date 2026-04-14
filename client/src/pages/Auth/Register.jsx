@@ -2,28 +2,49 @@ import React, { useState } from "react";
 import register from "../../assets/User Interface.gif";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router";
+import API from "../../api/API";
+import { saveSession } from "../../api/session";
+
 const Register = () => {
   const [uname, setuname] = useState("");
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [phonenumber, setPhonenumber] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     try {
       if (!uname || !email || !password || !phonenumber) {
         return toast.error("All fields are required");
       }
+
+      setLoading(true);
+      await API.post("/user/register", {
+        username: uname,
+        email,
+        password,
+        phone: phonenumber,
+      });
+
+      const loginResponse = await API.post("/user/login", { email, password });
+      saveSession({
+        token: loginResponse.data.token,
+        user: loginResponse.data.user,
+      });
+
       setuname("");
       setemail("");
       setpassword("");
       setPhonenumber("");
       toast.success("Registration Successful");
-      navigate("/cars");
+      navigate("/profile");
     } catch (error) {
-      console.log("Registration Error:", error);
+      toast.error(error.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -95,8 +116,12 @@ const Register = () => {
                 aria-describedby="phoneNumberHelp"
               />
             </div>
-            <button className="btn btn-primary w-100" onClick={handleRegister}>
-              Register Now
+            <button
+              className="btn btn-primary w-100"
+              onClick={handleRegister}
+              disabled={loading}
+            >
+              {loading ? "Registering..." : "Register Now"}
             </button>
           </div>
         </div>

@@ -37,6 +37,7 @@ const carSlice = createSlice({
     loading: false,
     success: false,
     cars: [],
+    selectedCar: null,
     error: null,
   },
   reducers: {},
@@ -68,7 +69,7 @@ const carSlice = createSlice({
         state.loading = false;
         state.error = null;
         state.success = true;
-        state.cars = action.payload.cars;
+        state.selectedCar = action.payload.car;
       })
       .addCase(getCarDetails.rejected, (state, action) => {
         state.loading = false;

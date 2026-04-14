@@ -1,6 +1,6 @@
 import React from "react";
 
-const BookingDetails = ({ setBookingDetails }) => {
+const BookingDetails = ({ setBookingDetails, booking }) => {
   return (
     <>
       <div className="modal d-flex" tabIndex={-1}>
@@ -17,11 +17,12 @@ const BookingDetails = ({ setBookingDetails }) => {
               />
             </div>
             <div className="modal-body">
-              <p>Journey Date:</p>
-              <p>Return Date:</p>
-              <p>Car Name:</p>
-              <p>Price:</p>
-              <p>Booking Status:</p>
+              <p>Journey Date: {booking?.startdate?.slice(0, 10)}</p>
+              <p>Return Date: {booking?.returndate?.slice(0, 10)}</p>
+              <p>Car Name: {booking?.car?.name}</p>
+              <p>Price: RS {booking?.price}</p>
+              <p>Total Price: RS {booking?.totalprice}</p>
+              <p>Booking Status: {booking?.status}</p>
             </div>
           </div>
         </div>

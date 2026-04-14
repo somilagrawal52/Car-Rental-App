@@ -1,7 +1,15 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { clearSession, getStoredUser } from "../api/session";
 
 const Header = () => {
+  const user = getStoredUser();
+
+  const handleLogout = () => {
+    clearSession();
+    window.location.href = "/login";
+  };
+
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -54,17 +62,27 @@ const Header = () => {
                 </Link>
               </li>
 
-              <li className="nav-item">
-                <Link className="nav-link active" to="/login">
-                  Login
-                </Link>
-              </li>
+              {user ? (
+                <li className="nav-item">
+                  <button className="nav-link active btn btn-link" onClick={handleLogout}>
+                    Logout
+                  </button>
+                </li>
+              ) : (
+                <>
+                  <li className="nav-item">
+                    <Link className="nav-link active" to="/login">
+                      Login
+                    </Link>
+                  </li>
 
-              <li className="nav-item">
-                <Link className="nav-link active" to="/register">
-                  Register
-                </Link>
-              </li>
+                  <li className="nav-item">
+                    <Link className="nav-link active" to="/register">
+                      Register
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
         </div>
