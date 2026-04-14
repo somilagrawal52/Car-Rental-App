@@ -70,6 +70,9 @@ const getCarById = async (req, res) => {
   try {
     const id = req.params.id;
     const car = await Car.findById(id);
+    if (!car) {
+      return res.status(404).json({ message: "Car not found" });
+    }
     res.status(200).json({
       success: true,
       message: "car details fetched successfully",
@@ -77,7 +80,7 @@ const getCarById = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    re.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -91,9 +94,12 @@ const updateCar = async (req, res) => {
     const updatedCar = await Car.findByIdAndUpdate(
       id,
       { $set: updated },
-      { new: true },
-      { returnOriginal: false }
+      { new: true, runValidators: true }
     );
+
+    if (!updatedCar) {
+      return res.status(404).json({ message: "Car not found" });
+    }
 
     res.status(200).json({
       success: true,

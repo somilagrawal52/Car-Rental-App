@@ -1,9 +1,12 @@
-const { validate } = require("../service/service");
+const { validate } = require("../Service/service");
 const User = require("../Model/User");
 
 async function checkforauth(req, res, next) {
   try {
-    const token = req.headers.authorization;
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
+      : authHeader;
     if (!token) {
       return res.status(401).json({ message: "No token provided" });
     }

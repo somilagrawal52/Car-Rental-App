@@ -4,35 +4,60 @@ const Car = require("../Model/Car");
 
 const createBooking = async (req, res) => {
   try {
-    const { user, car, startdate, returndate, totalprice, price } = req.body;
+    const { car, startdate, returndate } = req.body;
 
-    if (!car || !user || !startdate || !returndate || !price || !totalprice) {
-      return res.status(500).send({
+    if (!car || !startdate || !returndate) {
+      return res.status(400).send({
         success: false,
         message: "Please provide all fields",
       });
     }
+
+    const foundCar = await Car.findById(car);
+    if (!foundCar) {
+      return res.status(404).send({
+        success: false,
+        message: "Car not found",
+      });
+    }
+
+    const start = new Date(startdate);
+    const end = new Date(returndate);
+
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end < start) {
+      return res.status(400).send({
+        success: false,
+        message: "Please provide a valid booking date range",
+      });
+    }
+
+    const bookingDays = Math.max(
+      1,
+      Math.ceil((end - start) / (1000 * 60 * 60 * 24))
+    );
+    const price = foundCar.price;
+    const totalprice = bookingDays * price;
+
     const booking = new Booking({
-      user,
+      user: req.user._id,
       car,
-      startdate,
-      returndate,
+      startdate: start,
+      returndate: end,
       totalprice,
       price,
     });
     await booking.save();
 
-    res.status(200).send({
+    res.status(201).send({
       success: true,
-      message: "Booking crreated",
+      message: "Booking created",
       booking,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
-      success: true,
+      success: false,
       message: "Internal server error",
-      error,
     });
   }
 };
@@ -48,9 +73,8 @@ const getAllBooking = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send({
-      success: true,
+      success: false,
       message: "Internal server error",
-      error,
     });
   }
 };
@@ -61,14 +85,24 @@ const getById = async (req, res) => {
 
     const booking = await Booking.findById(bookingId);
     if (!booking) {
-      return es.status(404).send({
+      return res.status(404).send({
         success: false,
         message: "No bookings found on this id",
       });
     }
 
-    const user = await User.findById({ _id: booking.user });
-    const car = await Car.findById({ _id: booking.car });
+    if (
+      req.user.role !== "admin" &&
+      booking.user.toString() !== req.user._id.toString()
+    ) {
+      return res.status(403).send({
+        success: false,
+        message: "Access denied",
+      });
+    }
+
+    const user = await User.findById(booking.user);
+    const car = await Car.findById(booking.car);
     res.status(200).json({
       success: true,
       message: "Successfully got the booking by id",
@@ -87,30 +121,37 @@ const getById = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send({
-      success: true,
+      success: false,
       message: "Internal server error",
-      error,
     });
   }
 };
 
 const updateBookingStatus = async (req, res) => {
   try {
-    const { id } = req.params.id;
+    const { id } = req.params;
     if (!id) {
-      return res.status(500).send({
+      return res.status(400).send({
         success: false,
         message: "please provide booking id",
       });
     }
     const { status } = req.body;
-    const updatedStatus = await Booking.findByIDAndUpdate(
+    const booking = await Booking.findByIdAndUpdate(
       id,
       {
         $set: { status },
       },
-      { returnOriginal: false }
+      { new: true, runValidators: true }
     );
+
+    if (!booking) {
+      return res.status(404).send({
+        success: false,
+        message: "Booking not found",
+      });
+    }
+
     res.status(200).send({
       success: true,
       message: "booking status updated successfully",
@@ -119,25 +160,30 @@ const updateBookingStatus = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send({
-      success: true,
+      success: false,
       message: "Internal server error",
-      error,
     });
   }
 };
 
 const getUserBooking = async (req, res) => {
   try {
-    const { id } = req.params.id;
+    const { id } = req.params;
     if (!id) {
-      return res.status(500).send({
+      return res.status(400).send({
         success: false,
         message: "please provide booking id",
       });
     }
-    const user = await User.findById({ _id: id });
-    const booking = await Booking.find({ user: user._id });
-    const car = await Car.find({ _id: booking[0].car });
+
+    if (req.user.role !== "admin" && req.user._id.toString() !== id.toString()) {
+      return res.status(403).send({
+        success: false,
+        message: "Access denied",
+      });
+    }
+
+    const booking = await Booking.find({ user: id }).populate("car");
 
     res.status(200).send({
       success: true,
@@ -148,9 +194,27 @@ const getUserBooking = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send({
-      success: true,
+      success: false,
       message: "Internal server error",
-      error,
+    });
+  }
+};
+
+const getMyBookings = async (req, res) => {
+  try {
+    const booking = await Booking.find({ user: req.user._id }).populate("car");
+
+    res.status(200).send({
+      success: true,
+      message: "here is your booking",
+      totalBooking: booking.length,
+      booking,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Internal server error",
     });
   }
 };
@@ -161,4 +225,5 @@ module.exports = {
   getById,
   updateBookingStatus,
   getUserBooking,
+  getMyBookings,
 };
