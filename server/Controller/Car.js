@@ -21,28 +21,33 @@ const addCar = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    if (!req.file) {
-      return res.status(404).json({
-        success: false,
-        message: "please add image",
-      });
+    let carImage = null;
+    if (req.file) {
+      carImage = req.file.buffer.toString("base64");
+    } else if (image) {
+      carImage = image;
     }
 
-    const photobase64 = req.file ? req.file.buffer.toString("base64") : null;
+    if (!carImage) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide an image (file upload or image URL)",
+      });
+    }
 
     const newCar = new Car({
       name,
       category,
-      seats,
-      fuel,
-      year,
+      seats: seats ? Number(seats) : 4,
+      fuel: fuel || "Petrol",
+      year: Number(year),
       model,
-      milage,
-      price,
-      transmission,
-      image: photobase64,
+      milage: milage ? Number(milage) : 12,
+      price: price ? Number(price) : 1500,
+      transmission: transmission === true || transmission === "true" || transmission === "Automatic",
+      image: carImage,
       about,
-      status,
+      status: status !== undefined ? (status === true || status === "true") : true,
     });
     await newCar.save();
     res.status(201).json({ message: "Car added successfully", car: newCar });
